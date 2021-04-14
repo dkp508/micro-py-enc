@@ -1,9 +1,24 @@
 import time
+from network import LoRa
+import socket
+import time
+import ubinascii
+import struct
 
-available_networks = ["lte", "wifi"]#, "sigfox", "lora", "bluetooth"]
+
+available_networks = ["wifi", "lte", "lora", "sigfox"]
+
+def appears_more_once(network_list):
+    for item in network_list:
+        if available_networks.count(item) > 1:
+            return True
+    return False
+
+if appears_more_once(available_networks):
+    raise Exception("Duplicates are in the available networks, remove duplicate networks")
 
 networks = 0
-message = "hello"
+message = "48341be6644c5eeb650561460ca6c3a39b1aebf1bbac0bcfa9c14911dce8a955"
 key = "123"
 hashed = "321"
 
@@ -49,7 +64,6 @@ def lora_send(data_to_send):
 pybytes.disconnect()
 
 networks = len(available_networks)
-print(networks)
 
 if networks == 0:
     print("No networks available")
@@ -60,90 +74,198 @@ if networks == 1:
         pybytes.send_signal(1, message)
         pybytes.send_signal(2, key)
         pybytes.send_signal(3, hashed)
+        print("message key and hash sent by lte")
     elif "wifi" in available_networks:
         pybytes.connect_wifi()
         pybytes.send_signal(1, message)
         pybytes.send_signal(2, key)
         pybytes.send_signal(3, hashed)
+        print("message key and hash sent by wifi")
     elif "sigfox" in available_networks:
         pybytes.connect_sigfox()
         pybytes.send_signal(1, message)
         pybytes.send_signal(2, key)
         pybytes.send_signal(3, hashed)
+        print("message key and hash sent by sigfox")
     elif "lora" in available_networks:
         lora_send(message)
         lora_send(key)
         lora_send(hashed)
-    #if "bluetooth" in available_networks:
+        print("message key and hash sent by lora")
     pybytes.disconnect()
 
 if networks == 2:
-    if available_networks[0] == "lte"
+    if available_networks[0] == "lte":
         pybytes.connect_lte()
         pybytes.send_signal(1, message)
         pybytes.send_signal(3, hashed)
-    elif available_networks[0] == "wifi"
+        print("message and hash sent by lte")
+    elif available_networks[0] == "wifi":
         pybytes.connect_wifi()
         pybytes.send_signal(1, message)
         pybytes.send_signal(3, hashed)
-    elif available_networks[0] == "sigfox"
-        pybytes.connect_lte()
+        print("message and hash sent by wifi")
+    elif available_networks[0] == "sigfox":
+        pybytes.connect_sigfox()
         pybytes.send_signal(1, message)
         pybytes.send_signal(3, hashed)
-    elif available_networks[0] == "lora"
+        print("message and hash sent by sigfox")
+    elif available_networks[0] == "lora":
         lora_send(message)
         lora_send(hashed)
-    pybytes.disconnect()
-    if available_networks[1] == "lte"
-        pybytes.connect_lte()
-        pybytes.send_signal(2, key)
-    elif available_networks[1] == "wifi"
-        pybytes.connect_wifi()
-        pybytes.send_signal(2, key)
-    elif available_networks[1] == "sigfox"
-        pybytes.connect_lte()
-        pybytes.send_signal(2, key)
-    elif available_networks[1] == "lora"
-        lora_send(key)
+        print("message and hash sent by lora")
+
     pybytes.disconnect()
 
-if networks >= 3:
-    if available_networks[0] == "lte"
+    if available_networks[1] == "lte":
+        pybytes.connect_lte()
+        pybytes.send_signal(2, key)
+        print("key sent by lte")
+    elif available_networks[1] == "wifi":
+        pybytes.connect_wifi()
+        pybytes.send_signal(2, key)
+        print("key sent by wifi")
+    elif available_networks[1] == "sigfox":
+        pybytes.connect_sigfox()
+        pybytes.send_signal(2, key)
+        print("key sent by sigfox")
+    elif available_networks[1] == "lora":
+        lora_send(key)
+        print("key sent by lora")
+
+    pybytes.disconnect()
+
+if networks == 3:
+    if available_networks[0] == "lte":
         pybytes.connect_lte()
         pybytes.send_signal(1, message)
-    elif available_networks[0] == "wifi"
+        print("message sent via lte")
+    elif available_networks[0] == "wifi":
         pybytes.connect_wifi()
         pybytes.send_signal(1, message)
-    elif available_networks[0] == "sigfox"
-        pybytes.connect_lte()
+        print("message sent via Wifi")
+    elif available_networks[0] == "sigfox":
+        pybytes.connect_sigfox()
         pybytes.send_signal(1, message)
-    elif available_networks[0] == "lora"
+        print("message sent via sigfox")
+    elif available_networks[0] == "lora":
         lora_send(message)
+        print("message sent via Lora")
+
     pybytes.disconnect()
-    if available_networks[1] == "lte"
+
+    if available_networks[1] == "lte":
         pybytes.connect_lte()
         pybytes.send_signal(2, key)
-    elif available_networks[1] == "wifi"
+        print("key sent via lte")
+    elif available_networks[1] == "wifi":
         pybytes.connect_wifi()
         pybytes.send_signal(2, key)
-    elif available_networks[1] == "sigfox"
-        pybytes.connect_lte()
+        print("key sent via wifi")
+    elif available_networks[1] == "sigfox":
+        pybytes.connect_sigfox()
         pybytes.send_signal(2, key)
-    elif available_networks[1] == "lora"
+        print("key sent via sigfox")
+    elif available_networks[1] == "lora":
         lora_send(key)
+        print("key sent via Lora")
+
     pybytes.disconnect()
-    if available_networks[2] == "lte"
+
+    if available_networks[2] == "lte":
         pybytes.connect_lte()
         pybytes.send_signal(3, hashed)
-    elif available_networks[2] == "wifi"
+        print("hash sent via lte")
+    elif available_networks[2] == "wifi":
         pybytes.connect_wifi()
         pybytes.send_signal(3, hashed)
-    elif available_networks[2] == "sigfox"
-        pybytes.connect_lte()
+        print("hash sent via wifi")
+    elif available_networks[2] == "sigfox":
+        pybytes.connect_sigfox()
         pybytes.send_signal(3, hashed)
-    elif available_networks[2] == "lora"
+        print("hash sent via sigfox")
+    elif available_networks[2] == "lora":
         lora_send(hashed)
+        print("hash sent via lora")
+
     pybytes.disconnect()
 
 
+if networks == 4:
+    message_decode = ubinascii.unhexlify(message)
+    iv = message_decode[:16]
+    cipher_text_no_iv = message_decode[16:]
+    iv = ubinascii.hexlify(iv).decode()
+    cipher_text_no_iv = ubinascii.hexlify(cipher_text_no_iv).decode()
 
+    if available_networks[0] == "lte":
+        pybytes.connect_lte()
+        pybytes.send_signal(1, cipher_text_no_iv)
+        print("cipher text no iv is sent by lte: ", cipher_text_no_iv)
+    elif available_networks[0] == "wifi":
+        pybytes.connect_wifi()
+        pybytes.send_signal(1, cipher_text_no_iv)
+        print("cipher text no iv is sent by wifi: ", cipher_text_no_iv)
+    elif available_networks[0] == "sigfox":
+        pybytes.connect_sigfox()
+        pybytes.send_signal(1, cipher_text_no_iv)
+        print("cipher text no iv is sent by sigfox: ", cipher_text_no_iv)
+    elif available_networks[0] == "lora":
+        lora_send(cipher_text_no_iv)
+        print("cipher text no iv is sent by lora: ", cipher_text_no_iv)
+
+    pybytes.disconnect()
+
+    if available_networks[1] == "lte":
+        pybytes.connect_lte()
+        pybytes.send_signal(2, key)
+        print("key sent by lte")
+    elif available_networks[1] == "wifi":
+        pybytes.connect_wifi()
+        pybytes.send_signal(2, key)
+        print("key sent by wifi")
+    elif available_networks[1] == "sigfox":
+        pybytes.connect_sigfox()
+        pybytes.send_signal(2, key)
+        print("key sent by sigfox")
+    elif available_networks[1] == "lora":
+        lora_send(key)
+        print("key sent by lora")
+
+    pybytes.disconnect()
+
+    if available_networks[2] == "lte":
+        pybytes.connect_lte()
+        pybytes.send_signal(3, hashed)
+        print("hash sent by lte")
+    elif available_networks[2] == "wifi":
+        pybytes.connect_wifi()
+        pybytes.send_signal(3, hashed)
+        print("hash sent by wifi")
+    elif available_networks[2] == "sigfox":
+        pybytes.connect_sigfox()
+        pybytes.send_signal(3, hashed)
+        print("hash sent by sigfox")
+    elif available_networks[2] == "lora":
+        lora_send(hashed)
+        print("hash sent by lora")
+
+    pybytes.disconnect()
+
+    if available_networks[3] == "lte":
+        pybytes.connect_lte()
+        pybytes.send_signal(4, iv)
+        print("iv sent by lte: ", iv)
+    elif available_networks[3] == "wifi":
+        pybytes.connect_wifi()
+        pybytes.send_signal(4, iv)
+        print("iv sent by wifi: ", iv)
+    elif available_networks[3] == "sigfox":
+        pybytes.connect_sigfox()
+        pybytes.send_signal(4, iv)
+        print("iv sent by sigfox: ", iv)
+    elif available_networks[3] == "lora":
+        lora_send(iv)
+        print("iv sent by lora: ", iv)
+    
+    pybytes.disconnect()
